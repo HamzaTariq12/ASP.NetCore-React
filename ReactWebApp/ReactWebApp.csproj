@@ -7,7 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="front-end\src\components\" />
+    <Compile Remove="front-end\**" />
+    <Content Remove="front-end\**" />
+    <EmbeddedResource Remove="front-end\**" />
+    <None Remove="front-end\**" />
   </ItemGroup>
 
 </Project>
