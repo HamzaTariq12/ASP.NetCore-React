@@ -1,0 +1,41 @@
+@rootURL = https://localhost:7215
+
+### Get All Games
+
+GET {{rootURL}}/games
+Accept: application/json
+
+### Get Single
+
+GET {{rootURL}}/games/1
+Accept: application/json
+
+### Create Game
+
+POST {{rootURL}}/games
+Accept: application/json
+Content-Type: application/json
+{
+    "genre": "Kids and FamilyKids and FamilyKids and FamilyKids and FamilyKids and FamilyKids and FamilyKids and FamilyKids and FamilyKids and FamilyKids and FamilyKids and FamilyKids and Family",
+    "price": 19.99,
+    "releaseDate": "2011-11-18"
+}
+
+### Update Game
+
+PUT {{rootURL}}/games/2
+Accept: application/json
+Content-Type: application/json
+{
+    "name": "Metro 2",
+    "genre": "Shooting",
+    "price": 29.99,
+    "releaseDate": "2003-11-18"
+}
+
+### Delete Game
+
+DELETE {{rootURL}}/games/3
+Accept: application/json
+
+### 

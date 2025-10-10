@@ -1,7 +1,18 @@
+using ReactWebApp.Data;
+using ReactWebApp.Endpoints;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// DB Registry
+var connString = builder.Configuration.GetConnectionString("GameStore");
+builder.Services.AddSqlite<GameStoreContext>(connString);
+
 var app = builder.Build();
 
-// Simple API endpoint
+// Game Endpoints
+app.MapGameEndpoints();
+
+// OTHER REACT + OTHER ROUTES
 app.MapGet("/api/message", () => new { text = "Hello from ASP.NET Core!" });
 app.MapGet("/Code", () => "Contoso was founded in 2000.");
 
