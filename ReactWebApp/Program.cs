@@ -11,6 +11,7 @@ var app = builder.Build();
 
 // Game Endpoints
 app.MapGameEndpoints();
+app.MapGenreEndpoints();
 
 // OTHER REACT + OTHER ROUTES
 app.MapGet("/api/message", () => new { text = "Hello from ASP.NET Core!" });
@@ -22,5 +23,7 @@ app.UseStaticFiles();
 
 // For React Router fallback
 app.MapFallbackToFile("index.html");
+
+await app.MigrateDbAsync();
 
 app.Run();

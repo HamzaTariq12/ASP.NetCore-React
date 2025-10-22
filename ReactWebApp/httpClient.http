@@ -1,5 +1,10 @@
 @rootURL = https://localhost:7215
 
+### Get All Genres
+
+GET {{rootURL}}/genres
+Accept: application/json
+
 ### Get All Games
 
 GET {{rootURL}}/games
@@ -7,7 +12,7 @@ Accept: application/json
 
 ### Get Single
 
-GET {{rootURL}}/games/1
+GET {{rootURL}}/games/2
 Accept: application/json
 
 ### Create Game
@@ -16,7 +21,8 @@ POST {{rootURL}}/games
 Accept: application/json
 Content-Type: application/json
 {
-    "genre": "Kids and FamilyKids and FamilyKids and FamilyKids and FamilyKids and FamilyKids and FamilyKids and FamilyKids and FamilyKids and FamilyKids and FamilyKids and FamilyKids and Family",
+    "name": "Minecraft 2",
+    "genreId": 5,
     "price": 19.99,
     "releaseDate": "2011-11-18"
 }
@@ -28,14 +34,14 @@ Accept: application/json
 Content-Type: application/json
 {
     "name": "Metro 2",
-    "genre": "Shooting",
+    "genreId": 1,
     "price": 29.99,
     "releaseDate": "2003-11-18"
 }
 
 ### Delete Game
 
-DELETE {{rootURL}}/games/3
+DELETE {{rootURL}}/games/6
 Accept: application/json
 
 ### 

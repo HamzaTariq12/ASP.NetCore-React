@@ -1,70 +1,70 @@
-﻿using ReactWebApp.Dtos;
+﻿using Microsoft.EntityFrameworkCore;
+using ReactWebApp.Data;
+using ReactWebApp.Dtos;
+using ReactWebApp.Entities;
+using ReactWebApp.Mapping;
 
 namespace ReactWebApp.Endpoints
 {
     public static class GameEndpoints
     {
-        // Games Data
-        public static readonly List<GameDto> games = [
-            new (1, "Metro 1", "Shooting", 19.99M, new DateOnly(1990, 2, 23)),
-            new (2, "Metro 2", "Shooting", 29.99M, new DateOnly(1994, 3, 15)),
-            new (3, "Tekken 3", "Fighting", 10.99M, new DateOnly(2000, 5, 16)),
-        ];
-
         public static RouteGroupBuilder MapGameEndpoints(this WebApplication app)
         {
             var group = app.MapGroup("/games")
                            .WithParameterValidation();
 
             // GET ALL
-            group.MapGet("/", () => games);
+            group.MapGet("/", async (GameStoreContext dbContext) => 
+                await dbContext.Games
+                         .Include(game => game.Genre)
+                         .Select(game => game.ToGameSummaryDto())
+                         .AsNoTracking()
+                         .ToListAsync());
 
             // GET SINGLE
-            group.MapGet("/{id}", (int id) =>
+            group.MapGet("/{id}", async (int id, GameStoreContext dbContext) =>
             {
-                GameDto? game = games.Find((game) => game.Id == id);
+                Game? game = await dbContext.Games.FindAsync(id);
 
-                return game is null ? Results.NotFound() : Results.Ok(game);
+                return game is null ? Results.NotFound() : Results.Ok(game.ToGameDetailsDto());
             }).WithName("GetGame");
 
             // CREATE
-            group.MapPost("/", (CreateGameDto newGame) =>
+            group.MapPost("/", async (CreateGameDto newGame, GameStoreContext dbContext) =>
             {
-                GameDto game = new(
-                    games.Count + 1,
-                    newGame.Name,
-                    newGame.Genre,
-                    newGame.Price,
-                    newGame.ReleaseDate);
+                Game game = newGame.ToEntity();
 
-                games.Add(game);
-                //return game;
-                return Results.CreatedAtRoute("GetGame", new { id = game.Id }, game);
-            });
+                dbContext.Games.Add(game);
+                await dbContext.SaveChangesAsync();
+
+                return Results.CreatedAtRoute("GetGame", new { id = game.Id }, game.ToGameDetailsDto());
+            }); 
 
             // UPDATE
-            group.MapPut("/{id}", (int id, UpdateGameDto updatedGame) =>
+            group.MapPut("/{id}", async (int id, UpdateGameDto updatedGame, GameStoreContext dbContext) =>
             {
-                var index = games.FindIndex(game => game.Id == id);
-                if (index == -1)
+                var existingGame = await dbContext.Games.FindAsync(id);
+                
+                if (existingGame is null)
                 {
                     return Results.NotFound();
                 }
-                games[index] = new GameDto(
-                    id,
-                    updatedGame.Name,
-                    updatedGame.Genre,
-                    updatedGame.Price,
-                    updatedGame.ReleaseDate);
 
-                //return games[index];
+                dbContext.Entry(existingGame)
+                    .CurrentValues
+                    .SetValues(updatedGame.ToEntity(id));
+
+                await dbContext.SaveChangesAsync();
+
                 return Results.NoContent();
             });
 
             // DELETE
-            group.MapDelete("/{id}", (int id) =>
+            group.MapDelete("/{id}", async (int id, GameStoreContext dbContext) =>
             {
-                games.RemoveAll(game => game.Id == id);
+                await dbContext.Games
+                         .Where(game => game.Id == id)
+                         .ExecuteDeleteAsync();
 
                 return Results.NoContent();
             });
